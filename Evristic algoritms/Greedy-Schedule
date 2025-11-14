@@ -1,0 +1,102 @@
+#include <iostream>
+#include <set>
+#include <vector>
+#include <algorithm>
+
+using namespace std;
+
+set<int> greedyVertexCover(vector<pair<int, int>>& edges) {
+    set<int> cover;
+    set<pair<int, int>> remainingEdges;
+
+    // Инициализировать множество ребер
+    for (auto& edge : edges) {
+        int u = min(edge.first, edge.second);
+        int v = max(edge.first, edge.second);
+        remainingEdges.insert({u, v});
+    }
+    
+    while (!remainingEdges.empty()) {
+        // Выбрать ребро
+        auto it = remainingEdges.begin();
+        int u = it->first;
+        int v = it->second;
+        remainingEdges.erase(it);
+
+        // Добавить обе вершины
+        cover.insert(u);
+        cover.insert(v);
+        
+        // Удалить инцидентные ребра
+        auto edgeIt = remainingEdges.begin();
+        while (edgeIt != remainingEdges.end()) {
+            if (edgeIt->first == u || edgeIt->first == v || 
+                edgeIt->second == u || edgeIt->second == v) {
+                edgeIt = remainingEdges.erase(edgeIt);
+            } else {
+                ++edgeIt;
+            }
+        }
+    }
+
+    return cover;
+}
+
+int main() {
+    vector<pair<int, int>> edges;
+    int n, u, v;
+    
+    cout << "Введите количество ребер: ";
+    cin >> n;
+    
+    cout << "Введите ребра (вершины от 0 до 9):" << endl;
+    for (int i = 0; i < n; i++) {
+        cout << "Ребро " << i+1 << ": ";
+        cin >> u >> v;
+        edges.push_back({u, v});
+    }
+
+    set<int> cover = greedyVertexCover(edges);
+
+    cout << "Размер покрытия: " << cover.size() << endl;
+    cout << "Покрытие: ";
+    for (int vertex : cover) {
+        cout << vertex << " ";
+    }
+    cout << endl;
+
+    // Проверка корректности
+    bool correct = true;
+    for (auto& edge : edges) {
+        if (cover.find(edge.first) == cover.end() && 
+            cover.find(edge.second) == cover.end()) {
+            correct = false;
+            break;
+        }
+    }
+    
+    if (correct) {
+        cout << "✓ Все ребра покрыты" << endl;
+    } else {
+        cout << "✗ Некоторые ребра не покрыты" << endl;
+    }
+
+    return 0;
+}
+//Результат работы кода
+
+Введите количество ребер: 10
+Введите ребра (вершины от 0 до 9):
+Ребро 1: 0 1
+Ребро 2: 1 2
+Ребро 3: 2 3
+Ребро 4: 3 4
+Ребро 5: 4 5
+Ребро 6: 5 6
+Ребро 7: 6 7
+Ребро 8: 7 8
+Ребро 9: 8 9
+Ребро 10: 9 0
+Размер покрытия: 10
+Покрытие: 0 1 2 3 4 5 6 7 8 9 
+Все ребра покрыты
